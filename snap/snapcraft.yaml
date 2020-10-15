@@ -1,0 +1,108 @@
+name: keeperrl
+base: core18 # the base snap is the execution environment for this snap
+adopt-info: keeperrl
+summary: KeeperRL
+description: |
+  Ambitious dungeon builder with roguelike elements.
+
+grade: stable
+confinement: strict
+
+parts:
+  launcher:
+    plugin: dump
+    source: snap/local
+  keeperrl:
+    plugin: make
+    source: https://github.com/miki151/keeperrl.git
+    source-tag: "$SNAPCRAFT_PROJECT_VERSION"
+    build-packages:
+      - libsdl2-dev
+      - libsdl2-image-dev
+      - libopenal-dev
+      - libvorbis-dev
+      - llvm-7
+      - clang-10
+      - build-essential
+      - libcurl4-openssl-dev
+    stage-packages:
+      - libasn1-8-heimdal
+      - libasound2
+      - libasyncns0
+      - libcurl4
+      - libflac8
+      - libgl1
+      - libglvnd0
+      - libglx0
+      - libgssapi3-heimdal
+      - libhcrypto4-heimdal
+      - libheimbase1-heimdal
+      - libheimntlm0-heimdal
+      - libhx509-5-heimdal
+      - libjbig0
+      - libjpeg-turbo8
+      - libkrb5-26-heimdal
+      - libldap-2.4-2
+      - libnghttp2-14
+      - libogg0
+      - libopenal1
+      - libpng16-16
+      - libpsl5
+      - libpulse0
+      - libroken18-heimdal
+      - librtmp1
+      - libsasl2-2
+      - libsdl2-2.0-0
+      - libsdl2-image-2.0-0
+      - libsndfile1
+      - libsndio6.1
+      - libtiff5
+      - libvorbis0a
+      - libvorbisenc2
+      - libvorbisfile3
+      - libwayland-client0
+      - libwayland-cursor0
+      - libwayland-egl1
+      - libwebp6
+      - libwind0-heimdal
+      - libx11-6
+      - libxau6
+      - libxcb1
+      - libxcursor1
+      - libxdmcp6
+      - libxext6
+      - libxfixes3
+      - libxi6
+      - libxinerama1
+      - libxkbcommon0
+      - libxrandr2
+      - libxrender1
+      - libxss1
+      - libxxf86vm1
+    build-environment:
+      - PATH: "/usr/lib/llvm-10/bin:$PATH"
+    override-pull: |
+      snapcraftctl pull
+      snapcraftctl set-version "$(git rev-parse --short HEAD)"
+    override-build: |
+      make RELEASE=true NO_STEAMWORKS=true
+      cp -a appconfig.txt keeper data_free data_contrib $SNAPCRAFT_PART_INSTALL
+  desktop-glib-only:
+    build-packages:
+      - libglib2.0-dev
+    plugin: make
+    source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
+    source-subdir: glib-only
+    stage-packages:
+      - libglib2.0-bin
+
+apps:
+  keeperrl:
+    command: desktop-launch $SNAP/bin/launch.sh
+    environment:
+      LD_LIBRARY_PATH: "$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio:$LD_LIBRARY_PATH"
+    plugs:
+      - x11
+      - opengl
+      - audio-playback
+      - network

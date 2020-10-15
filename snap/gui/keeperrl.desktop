@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=KeeperRL
+Comment=Ambitious dungeon builder with roguelike elements.
+Icon=${SNAP}/meta/gui/keeperrl.png
+Exec=keeperrl
+Terminal=false
+Categories=Game
