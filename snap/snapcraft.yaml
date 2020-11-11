@@ -15,7 +15,6 @@ parts:
   keeperrl:
     plugin: make
     source: https://github.com/miki151/keeperrl.git
-    source-tag: "$SNAPCRAFT_PROJECT_VERSION"
     build-packages:
       - libsdl2-dev
       - libsdl2-image-dev
