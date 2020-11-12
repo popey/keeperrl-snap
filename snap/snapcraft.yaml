@@ -81,8 +81,19 @@ parts:
     build-environment:
       - PATH: "/usr/lib/llvm-10/bin:$PATH"
     override-pull: |
+      set -x 
       snapcraftctl pull
-      snapcraftctl set-version "$(git rev-parse --short HEAD)"
+      last_committed_tag="$(git describe --tags --abbrev=0)"
+      last_released_tag=v"$(snap info keeperrl | awk '$1 == "beta:" { print $2 }')"
+      # If the latest tag from the upstream project has not been released to
+      # beta, build that tag instead of master.
+      if [ "${last_committed_tag}" != "${last_released_tag}" ]; then
+        git fetch
+        git checkout "${last_committed_tag}"
+        cd ../src
+        git checkout "${last_committed_tag}"
+      fi
+      snapcraftctl set-version "$(git describe --tags | tr -d 'v')"
     override-build: |
       make RELEASE=true NO_STEAMWORKS=true
       cp -a appconfig.txt keeper data_free data_contrib $SNAPCRAFT_PART_INSTALL
